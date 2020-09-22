@@ -27,7 +27,6 @@ function browser() {
 function scripts() {
   return src([
     'app/js/main.js',
-    'app/js/app.js',
   ])
       .pipe(eslint())
       .pipe(eslint.format())
@@ -94,7 +93,7 @@ function startWatch() {
     '!app/**/*.min.js',
   ], scripts)
   watch('app/**/*.html').on('change', browserSync.reload)
-  watch('app/images/src/**/8', images)
+  watch('app/images/src/**/*', images)
 }
 // update scripts
 exports.scripts = scripts
