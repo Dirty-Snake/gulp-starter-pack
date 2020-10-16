@@ -15,6 +15,7 @@ const del = require('del')
 const babel = require('gulp-babel')
 const eslint = require('gulp-eslint')
 const sourcemaps = require('gulp-sourcemaps')
+const rigger = require('gulp-rigger')
 
 function browser() {
   browserSync.init({
@@ -58,12 +59,19 @@ function styles() {
       .pipe(dest('app/css/'))
       .pipe(browserSync.stream())
 }
+function riggerHTML() {
+  return src('app/*.html')
+      .pipe(rigger())
+      .pipe(dest('app/'))
+      .pipe(browserSync.stream())
+}
 function images() {
   return src('app/images/src/**/*')
       .pipe(newer('app/images/dest/'))
       .pipe(imagemin())
       .pipe(dest('app/images/dest/'))
 }
+
 function cleanImg() {
   return del('app/images/dest/**/*', {
     force: true,
@@ -87,6 +95,7 @@ function cleanDist() {
 }
 // watcher project
 function startWatch() {
+  watch('app/*.html', riggerHTML)
   watch(`app/**/${preprocessor}/**/*`, styles)
   watch([
     'app/**/*.js',
@@ -95,6 +104,7 @@ function startWatch() {
   watch('app/**/*.html').on('change', browserSync.reload)
   watch('app/images/src/**/*', images)
 }
+
 // update scripts
 exports.scripts = scripts
 // update styles
@@ -105,7 +115,8 @@ exports.images = images
 exports.cleanImg = cleanImg
 // clean directory production
 exports.cleanDist = cleanDist
+exports.riggerHTML = riggerHTML
 // production project
 exports.build = series(cleanDist, styles, scripts, images, build)
 // dev project
-exports.default = parallel(scripts, styles, browser, startWatch)
+exports.default = parallel(riggerHTML, scripts, styles, browser, startWatch)
